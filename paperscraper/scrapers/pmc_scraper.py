@@ -1,4 +1,5 @@
 from paperscraper.scrapers.base.base_scraper import BaseScraper
+import re
 """A scraper of a PMC articles"""
 
 class PMC(BaseScraper):
@@ -9,7 +10,7 @@ class PMC(BaseScraper):
 
     def get_authors(self, soup):
         author_links = soup.find("div", {"class": "contrib-group fm-author"}).findAll("a")
-        authors = {};
+        authors = {}
 
         for i in range(len(author_links)):
             authors['a'+str(i+1)] = {'last_name':author_links[i].contents[0].split(" ")[-1], 'first_name':author_links[i].contents[0].split(" ")[0]}
@@ -24,6 +25,7 @@ class PMC(BaseScraper):
         # print(soup.find("p", id="__p1"))
         # [tag.unwrap() for tag in abstract.findAll(["em", "i", "b", "sub", "sup"])]
         # return abstract.find("p").contents[0]
+        return soup.find(id="Abs1").contents
 
     def get_body(self, soup):
         #TODO get working
@@ -33,12 +35,10 @@ class PMC(BaseScraper):
         return soup.find("span", {"class": "doi"}).find("a").getText()
 
     def get_keywords(self, soup):
-        keywords =  soup.find("span", {"class": "kwd-text"})
-        [tag.unwrap() for tag in keywords.findAll(["em", "i", "b", "sub", "sup"])]
-        return keywords.getText().split(", ")
+        return soup.find("span", {"class": "kwd-text"}).getText().split(", ")
 
     def get_pdf_url(self, soup):
-        return "https://www.ncbi.nlm.nih.gov/"+soup.find("div", {"class": "format-menu"}).findAll("li")[3].find("a")['href']
+        return self.website[0] + soup.find("div", {"class": "format-menu"}).find("li", text=re.compile(r'PDF\s\(\d\.\d\w\)')).find("a")['href']
 
     def get_title(self, soup):
         return soup.find("h1", {"class": "content-title"}).getText()
