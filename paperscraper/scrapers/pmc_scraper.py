@@ -28,8 +28,14 @@ class PMC(BaseScraper):
         return soup.find(id="Abs1").contents
 
     def get_body(self, soup):
-        #TODO get working
-        pass
+        obj = {}
+        sections = soup.findAll("div", {"class": "tsec sec"})
+        for i in range(0, len(sections)):
+            obj["section"+i] = {}
+            paragraphs = sections[i].contents.find("p")
+            for j in range(0, len(paragraphs)):
+                obj["section"+i]["p"+j] = item.contents
+        return obj
 
     def get_doi(self, soup):
         return soup.find("span", {"class": "doi"}).find("a").getText()
