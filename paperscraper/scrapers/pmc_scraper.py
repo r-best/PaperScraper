@@ -18,7 +18,9 @@ class PMC(BaseScraper):
         return authors
 
     def get_abstract(self,soup):
-        return soup.find("div", {"id": "Abs1"})#.findChildren("p")[0].contents
+        abstract = soup.find("div", {"id": "Abs1"}).findChildren("p")[0].contents
+        abstract = [str(x) for x in abstract]
+        return "".join(abstract)
 
     def get_body(self, soup):
         obj = {}
@@ -43,7 +45,8 @@ class PMC(BaseScraper):
 
         # For each paragraph, create an entry with its contents
         for i in range(0, len(paragraphs)):
-            obj["p"+str(i+1)] = paragraphs[i].contents[0]
+            paragraph = [str(x) for x in paragraphs[i].contents]
+            obj["p"+str(i+1)] = "".join(paragraph)
 
     def get_doi(self, soup):
         return soup.find("span", {"class": "doi"}).find("a").getText()
@@ -52,10 +55,7 @@ class PMC(BaseScraper):
         return soup.find("span", {"class": "kwd-text"}).getText().split(", ")
 
     def get_pdf_url(self, soup):
-        try:
-            return self.website[0] + soup.find("div", {"class": "format-menu"}).find("li", text=re.compile(r'PDF\s\(\d\.\d\w\)')).find("a")['href']
-        finally:
-            return 0
+        return self.website[0] + soup.find("div", {"class": "format-menu"}).find("li", text=re.compile(r'PDF\s\(\d\.\d\w\)')).find("a")['href']
 
     def get_title(self, soup):
         return soup.find("h1", {"class": "content-title"}).getText()
