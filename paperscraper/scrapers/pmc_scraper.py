@@ -1,10 +1,11 @@
+"""A scraper of a PMC articles"""
 from paperscraper.scrapers.base.base_scraper import BaseScraper
 import re
-"""A scraper of a PMC articles"""
+
 
 class PMC(BaseScraper):
 
-    def __init__(self,driver):
+    def __init__(self, driver):
         self.driver = driver
         self.website = ["ncbi.nlm.nih.gov"]
 
@@ -13,7 +14,8 @@ class PMC(BaseScraper):
         authors = {}
 
         for i in range(len(author_links)):
-            authors['a'+str(i+1)] = {'last_name':author_links[i].contents[0].split(" ")[-1], 'first_name':author_links[i].contents[0].split(" ")[0]}
+            authors['a' + str(i + 1)] = {'last_name': author_links[i].contents[0].split(" ")[-1],
+                                         'first_name': author_links[i].contents[0].split(" ")[0]}
 
         return authors
 
@@ -56,6 +58,9 @@ class PMC(BaseScraper):
 
     def get_pdf_url(self, soup):
         return self.website[0] + soup.find("div", {"class": "format-menu"}).find("li", text=re.compile(r'PDF\s\(\d\.\d\w\)')).find("a")['href']
+        keywords = soup.find("span", {"class": "kwd-text"})
+        [tag.unwrap() for tag in keywords.findAll(["em", "i", "b", "sub", "sup"])]
+        return keywords.getText().split(", ")
 
     def get_title(self, soup):
         return soup.find("h1", {"class": "content-title"}).getText()
