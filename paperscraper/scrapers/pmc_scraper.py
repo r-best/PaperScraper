@@ -28,10 +28,12 @@ class PMC(BaseScraper):
         obj = {}
         self._get_body(soup.find("div", {"id": "ui-ncbiinpagenav-1"}), obj)
         return obj
-    ##
-    # Recursive helper function for get_body()
-    ##
+
+
     def _get_body(self, section, obj):
+        """
+        Recursive helper function for get_body()
+        """
         # Find subsections and paragraphs of the given section
         subsections = section.findChildren("div", {"class": "tsec sec"}, recursive=False)
         paragraphs = section.findAll("p", recursive=False)
@@ -58,9 +60,6 @@ class PMC(BaseScraper):
 
     def get_pdf_url(self, soup):
         return self.website[0] + soup.find("div", {"class": "format-menu"}).find("li", text=re.compile(r'PDF\s\(\d\.\d\w\)')).find("a")['href']
-        keywords = soup.find("span", {"class": "kwd-text"})
-        [tag.unwrap() for tag in keywords.findAll(["em", "i", "b", "sub", "sup"])]
-        return keywords.getText().split(", ")
 
     def get_title(self, soup):
         return soup.find("h1", {"class": "content-title"}).getText()
